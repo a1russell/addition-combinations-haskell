@@ -2,5 +2,8 @@ module AdditionCombinationFinder where
 
 
 findAdditionCombinations :: Int -> [[Int]]
-findAdditionCombinations 1 = [[]]
-findAdditionCombinations x = [[1, 1]]
+findAdditionCombinations 0 = []
+findAdditionCombinations x = findAdditionCombinations' [x]
+
+findAdditionCombinations' :: [Int] -> [[Int]]
+findAdditionCombinations' (x:xs) = (x - 1 : 1 : xs) : [x : xs]
