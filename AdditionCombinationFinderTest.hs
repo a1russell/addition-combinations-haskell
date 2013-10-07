@@ -50,28 +50,24 @@ findTailsTests =
     ]
 
 absorbTailTests =
-    [ "does not absorb tail when right-hand side is nothing" ~: do
-        Nothing @=? absorbTail (Just [1]) Nothing
-    , "does not absorb tail when left-hand side is nothing" ~: do
-        Nothing @=? absorbTail Nothing (Just [1])
-    , "does not absorb tail when left-hand side is empty" ~: do
-        Nothing @=? absorbTail (Just []) (Just [1])
+    [ "does not absorb tail when left-hand side is empty" ~: do
+        Nothing @=? absorbTail [] [1]
     , "does not absorb tail when right-hand side is empty" ~: do
-        Nothing @=? absorbTail (Just [1]) (Just [])
+        Nothing @=? absorbTail [1] []
     , "does not absorb tail when right-hand side has only one element" ~: do
-        Nothing @=? absorbTail (Just [2]) (Just [1])
+        Nothing @=? absorbTail [2] [1]
     , "does not absorb tail when rhs head >= lhs tail of one-element list" ~: do
-        Nothing @=? absorbTail (Just [2]) (Just [2, 1])
+        Nothing @=? absorbTail [2] [2, 1]
     , "does not absorb tail when rhs sum > lhs tail of one-element list" ~: do
-        Nothing @=? absorbTail (Just [2]) (Just [1, 2])
+        Nothing @=? absorbTail [2] [1, 2]
     , "does not absorb tail when rhs head >= lhs tail of two-element list" ~: do
-        Nothing @=? absorbTail (Just [3, 2]) (Just [2, 1])
+        Nothing @=? absorbTail [3, 2] [2, 1]
     , "absorbs 1 into right-hand head of two-element list" ~: do
-        (Just [3, 3]) @=? absorbTail (Just [3]) (Just [2, 1])
+        (Just [3, 3]) @=? absorbTail [3] [2, 1]
     , "absorbs 1 into rhs head when both sides have 2 elements" ~: do
-        (Just [4, 3, 3]) @=? absorbTail (Just [4, 3]) (Just [2, 1])
+        (Just [4, 3, 3]) @=? absorbTail [4, 3] [2, 1]
     , "absorbs 1 into head of three-element list" ~: do
-        (Just [3, 3, 1]) @=? absorbTail (Just [3]) (Just [2, 1, 1])
+        (Just [3, 3, 1]) @=? absorbTail [3] [2, 1, 1]
     ]
 
 tests = test $ moveOneFromHeadToTailTests

@@ -29,18 +29,16 @@ findTails (Just allXs@(_:[])) = [Just allXs]
 findTails (Just allXs@(x:x':xs)) =
     let xTail = x' : xs
         first2x = [x, x']
-        absorbed = absorbTail (Just [x]) (Just xTail)
-        absorbed' = absorbTail (Just first2x) (Just xs)
+        absorbed = absorbTail [x] xTail
+        absorbed' = absorbTail first2x xs
     in [absorbed, absorbed'] ++ (findTails absorbed) ++
        (findTails absorbed')
 
-absorbTail :: Maybe [Int] -> Maybe [Int] -> Maybe [Int]
-absorbTail Nothing _ = Nothing
-absorbTail _ Nothing = Nothing
-absorbTail (Just []) _ = Nothing
-absorbTail _ (Just []) = Nothing
-absorbTail _ (Just (_:[])) = Nothing
-absorbTail (Just lhs) (Just rhs@(x:x':xs))
+absorbTail :: [Int] -> [Int] -> Maybe [Int]
+absorbTail [] _ = Nothing
+absorbTail _ [] = Nothing
+absorbTail _ (_:[]) = Nothing
+absorbTail lhs rhs@(x:x':xs)
     | xSum > (last lhs) = Nothing
     | otherwise = Just (lhs ++ (xSum : xs))
     where xSum = x + x'
