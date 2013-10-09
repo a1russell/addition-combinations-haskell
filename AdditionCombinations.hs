@@ -1,4 +1,4 @@
-module AdditionCombinationFinder where
+module AdditionCombinations where
 
 import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set

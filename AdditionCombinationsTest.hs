@@ -3,7 +3,7 @@ import qualified Data.Maybe as Maybe
 
 import Test.HUnit
 
-import AdditionCombinationFinder
+import AdditionCombinations
 
 additionCombinationsTests =
     [ "finds no combinations for 0" ~: do
