@@ -1,15 +1,15 @@
 import qualified Data.Set as Set
-import Data.Maybe
+import qualified Data.Maybe as Maybe
 
 import Test.HUnit
 
 import AdditionCombinationFinder
 
-findAdditionCombinationsTests =
+additionCombinationsTests =
     [ "finds no combinations for 0" ~: do
-        Set.fromList [] @=? findAdditionCombinations 0
+        Set.fromList [] @=? additionCombinations 0
     , "finds combination for 2" ~: do
-        Set.fromList [[1, 1], [2]] @=? findAdditionCombinations 2
+        Set.fromList [[1, 1], [2]] @=? additionCombinations 2
     , "finds combinations for 7" ~: do
         let combinationsOf7 =
                 [ [1, 1, 1, 1, 1, 1, 1]
@@ -28,52 +28,56 @@ findAdditionCombinationsTests =
                 , [6, 1]
                 , [7]
                 ]
-        Set.fromList combinationsOf7 @=? findAdditionCombinations 7
+        Set.fromList combinationsOf7 @=? additionCombinations 7
     ]
 
-moveOneFromHeadToTailTests =
+expandedTailCombinationTests =
     [ "separates 1 from 2" ~: do
-        [1, 1] @=? moveOneFromHeadToTail [2]
+        [1, 1] @=? expandedTailCombination [2]
     , "moves 1 from 3 into tail of [3, 1]" ~: do
-        [2, 1, 1] @=? moveOneFromHeadToTail [3, 1]
+        [2, 1, 1] @=? expandedTailCombination [3, 1]
     ]
 
-findTailsTests =
+collapsedTailCombosTests =
     [ "finds 3 non-Nothing tails when given [3, 1, 1, 1, 1]" ~: do
-        3 @=? (length . catMaybes . findTails . Just $ [3, 1, 1, 1, 1])
+        3 @=? (length . Maybe.catMaybes . collapsedTailCombos . Just $
+              [3, 1, 1, 1, 1])
     , "finds [3, 2, 1, 1] when finding tails of [3, 1, 1, 1, 1]" ~: do
-        True @=? (elem [3, 2, 1, 1] $ catMaybes . findTails . Just $ [3, 1, 1, 1, 1])
+        True @=? (elem [3, 2, 1, 1] $ Maybe.catMaybes . collapsedTailCombos .
+                                      Just $ [3, 1, 1, 1, 1] )
     , "finds [3, 2, 2] when finding tails of [3, 1, 1, 1, 1]" ~: do
-        True @=? (elem [3, 2, 2] $ catMaybes . findTails . Just $ [3, 1, 1, 1, 1])
+        True @=? (elem [3, 2, 2] $ Maybe.catMaybes . collapsedTailCombos .
+                                   Just $ [3, 1, 1, 1, 1])
     , "finds [3, 3, 1] when finding tails of [3, 1, 1, 1, 1]" ~: do
-        True @=? (elem [3, 3, 1] $ catMaybes . findTails . Just $ [3, 1, 1, 1, 1])
+        True @=? (elem [3, 3, 1] $ Maybe.catMaybes . collapsedTailCombos .
+                                   Just $ [3, 1, 1, 1, 1])
     ]
 
-absorbTailTests =
-    [ "does not absorb tail when left-hand side is empty" ~: do
-        Nothing @=? absorbTail [] [1]
-    , "does not absorb tail when right-hand side is empty" ~: do
-        Nothing @=? absorbTail [1] []
-    , "does not absorb tail when right-hand side has only one element" ~: do
-        Nothing @=? absorbTail [2] [1]
-    , "does not absorb tail when rhs head >= lhs tail of one-element list" ~: do
-        Nothing @=? absorbTail [2] [2, 1]
-    , "does not absorb tail when rhs sum > lhs tail of one-element list" ~: do
-        Nothing @=? absorbTail [2] [1, 2]
-    , "does not absorb tail when rhs head >= lhs tail of two-element list" ~: do
-        Nothing @=? absorbTail [3, 2] [2, 1]
-    , "absorbs 1 into right-hand head of two-element list" ~: do
-        (Just [3, 3]) @=? absorbTail [3] [2, 1]
-    , "absorbs 1 into rhs head when both sides have 2 elements" ~: do
-        (Just [4, 3, 3]) @=? absorbTail [4, 3] [2, 1]
-    , "absorbs 1 into head of three-element list" ~: do
-        (Just [3, 3, 1]) @=? absorbTail [3] [2, 1, 1]
+collapseIntoTests =
+    [ "does not collapse when split at less than 1" ~: do
+        Nothing @=? collapseInto 0 [1]
+    , "does not collapse when right-hand side of split is empty" ~: do
+        Nothing @=? collapseInto 1 [1]
+    , "does not collapse when right-hand side of split has only one element" ~:
+        do Nothing @=? collapseInto 1 [2, 1]
+    , "does not collapse when rhs head >= tail of one-element lhs list" ~: do
+        Nothing @=? collapseInto 1 [2, 2, 1]
+    , "does not collapse when rhs sum > tail of one-element lhs list" ~: do
+        Nothing @=? collapseInto 1 [3, 2, 2]
+    , "does not collapse when rhs head >= tail of two-element lhs list" ~: do
+        Nothing @=? collapseInto 2 [3, 2, 2, 1]
+    , "collapses 1 into head of two-element right-hand side list" ~: do
+        (Just [3, 3]) @=? collapseInto 1 [3, 2, 1]
+    , "collapses 1 into rhs head when both sides have 2 elements" ~: do
+        (Just [4, 3, 3]) @=? collapseInto 2 [4, 3, 2, 1]
+    , "collapses 1 into head of three-element rhs list" ~: do
+        (Just [3, 3, 1]) @=? collapseInto 1 [3, 2, 1, 1]
     ]
 
-tests = test $ moveOneFromHeadToTailTests
-             ++ findTailsTests
-             ++ absorbTailTests
-             ++ findAdditionCombinationsTests
+tests = test $ expandedTailCombinationTests
+             ++ collapsedTailCombosTests
+             ++ collapseIntoTests
+             ++ additionCombinationsTests
 
 main :: IO Counts
 main = runTestTT tests

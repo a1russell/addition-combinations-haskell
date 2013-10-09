@@ -1,44 +1,51 @@
 module AdditionCombinationFinder where
 
+import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
-import Data.Maybe
-import Control.Monad
 
-findAdditionCombinations :: Int -> Set.Set [Int]
-findAdditionCombinations 0 = Set.empty
-findAdditionCombinations x = Set.fromList $ findAdditionCombinations' [[x]]
+additionCombinations :: Int -> Set.Set [Int]
+additionCombinations 0 = Set.empty
+additionCombinations x = Set.fromList $ additionCombinations' [[x]]
 
-findAdditionCombinations' :: [[Int]] -> [[Int]]
-findAdditionCombinations' allXs@(x:_)
-    | all (==1) x = allXs
-    | otherwise = findAdditionCombinations' $
-                  (findAdditionCombinations'' x) ++ allXs
+additionCombinations' :: [[Int]] -> [[Int]]
+additionCombinations' allCombos@(headCombo:_)
+    | all (==1) headCombo = allCombos
+    | otherwise = additionCombinations' $ newCombos ++ allCombos
+    where newCombo = Just . expandedTailCombination $ headCombo
+          newCombos = Maybe.catMaybes $ newCombo : collapsedTailCombos newCombo
 
-findAdditionCombinations'' :: [Int] -> [[Int]]
-findAdditionCombinations'' x =
-    let newCombination = moveOneFromHeadToTail x
-    in catMaybes $ (Just newCombination) : (findTails (Just newCombination))
+expandedTailCombination :: [Int] -> [Int]
+expandedTailCombination (x:xs) = (x - 1 : 1 : xs)
 
-moveOneFromHeadToTail :: [Int] -> [Int]
-moveOneFromHeadToTail (x:xs) = (x - 1 : 1 : xs)
+collapsedTailCombos :: Maybe [Int] -> [Maybe [Int]]
+collapsedTailCombos = collapsedTailCombos' 2
 
-findTails :: Maybe [Int] -> [Maybe [Int]]
-findTails Nothing = [Nothing]
-findTails (Just []) = [Nothing]
-findTails (Just allXs@(_:[])) = [Just allXs]
-findTails (Just allXs@(x:x':xs)) =
-    let xTail = x' : xs
-        first2x = [x, x']
-        absorbed = absorbTail [x] xTail
-        absorbed' = absorbTail first2x xs
-    in [absorbed, absorbed'] ++ (findTails absorbed) ++
-       (findTails absorbed')
+collapsedTailCombos' :: Int -> Maybe [Int] -> [Maybe [Int]]
+collapsedTailCombos' _ Nothing = [Nothing]
+collapsedTailCombos' _ (Just []) = [Nothing]
+collapsedTailCombos' splitIndex (Just allXs@(x:xs))
+    | length allXs < splitIndex = [Just allXs]
+    | otherwise =
+        [collapsed, collapsed'] ++
+        collapsedTailCombos collapsed ++
+        collapsedTailCombos' (splitIndex + 1) collapsed'
+    where splitXs = splitAt splitIndex allXs
+          firstXs = fst splitXs
+          lastXs = snd splitXs
+          collapsed = collapseInto 1 allXs
+          collapsed' = collapseInto splitIndex allXs
 
-absorbTail :: [Int] -> [Int] -> Maybe [Int]
-absorbTail [] _ = Nothing
-absorbTail _ [] = Nothing
-absorbTail _ (_:[]) = Nothing
-absorbTail lhs rhs@(x:x':xs)
-    | xSum > (last lhs) = Nothing
-    | otherwise = Just (lhs ++ (xSum : xs))
-    where xSum = x + x'
+collapseInto :: Int -> [Int] -> Maybe [Int]
+collapseInto _ [] = Nothing
+collapseInto splitIndex xs
+    | splitIndex < 1 = Nothing
+    | length rhs < numberToCollapse = Nothing
+    | collapsedRhsHead > last lhs = Nothing
+    | otherwise = Just $ lhs ++ collapsedRhsHead : newRhsTail
+    where splitXs = splitAt splitIndex xs
+          lhs = fst splitXs
+          rhs = snd splitXs
+          numberToCollapse = 2
+          splitRhs = splitAt numberToCollapse rhs
+          collapsedRhsHead = sum $ fst splitRhs
+          newRhsTail = snd splitRhs
