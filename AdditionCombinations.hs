@@ -1,5 +1,6 @@
 module AdditionCombinations where
 
+import qualified Control.Monad as Monad
 import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
 
@@ -11,29 +12,27 @@ additionCombinations' :: [[Int]] -> [[Int]]
 additionCombinations' allCombos@(headCombo:_)
     | all (==1) headCombo = allCombos
     | otherwise = additionCombinations' $ newCombos ++ allCombos
-    where newCombo = Just . expandedTailCombination $ headCombo
-          newCombos = Maybe.catMaybes $ newCombo : collapsedTailCombos newCombo
+    where newCombo = expandedTailCombination headCombo
+          newCombos = newCombo : collapsedTailCombos newCombo
 
 expandedTailCombination :: [Int] -> [Int]
 expandedTailCombination (x:xs) = (x - 1 : 1 : xs)
 
-collapsedTailCombos :: Maybe [Int] -> [Maybe [Int]]
+collapsedTailCombos :: [Int] -> [[Int]]
 collapsedTailCombos = collapsedTailCombos' 2
 
-collapsedTailCombos' :: Int -> Maybe [Int] -> [Maybe [Int]]
-collapsedTailCombos' _ Nothing = [Nothing]
-collapsedTailCombos' _ (Just []) = [Nothing]
-collapsedTailCombos' splitIndex (Just allXs@(x:xs))
-    | length allXs < splitIndex = [Just allXs]
-    | otherwise =
-        [collapsed, collapsed'] ++
-        collapsedTailCombos collapsed ++
-        collapsedTailCombos' (splitIndex + 1) collapsed'
-    where splitXs = splitAt splitIndex allXs
-          firstXs = fst splitXs
-          lastXs = snd splitXs
-          collapsed = collapseInto 1 allXs
-          collapsed' = collapseInto splitIndex allXs
+collapsedTailCombos' :: Int -> [Int] -> [[Int]]
+collapsedTailCombos' _ [] = []
+collapsedTailCombos' splitIndex allXs@(x:xs)
+    | length allXs < splitIndex = [allXs]
+    | otherwise = collapsed ++ collapsedIntoHead' ++ collapsedIntoSplit'
+    where collapsed = Maybe.catMaybes [collapsedIntoHead, collapsedIntoSplit]
+          collapsedIntoHead = collapseInto 1 allXs
+          collapsedIntoSplit = collapseInto splitIndex allXs
+          collapsedIntoHead' = emptyOr collapsedTailCombos collapsedIntoHead
+          collapsedIntoSplit' = emptyOr combosForNextSplit collapsedIntoSplit
+          combosForNextSplit = collapsedTailCombos' $ splitIndex + 1
+          emptyOr = maybe []
 
 collapseInto :: Int -> [Int] -> Maybe [Int]
 collapseInto _ [] = Nothing

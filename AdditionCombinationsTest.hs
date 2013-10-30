@@ -39,18 +39,14 @@ expandedTailCombinationTests =
     ]
 
 collapsedTailCombosTests =
-    [ "finds 3 non-Nothing tails when given [3, 1, 1, 1, 1]" ~: do
-        3 @=? (length . Maybe.catMaybes . collapsedTailCombos . Just $
-              [3, 1, 1, 1, 1])
+    [ "finds 3 tails when given [3, 1, 1, 1, 1]" ~: do
+        3 @=? (length . collapsedTailCombos $ [3, 1, 1, 1, 1])
     , "finds [3, 2, 1, 1] when finding tails of [3, 1, 1, 1, 1]" ~: do
-        True @=? (elem [3, 2, 1, 1] $ Maybe.catMaybes . collapsedTailCombos .
-                                      Just $ [3, 1, 1, 1, 1] )
+        True @=? (elem [3, 2, 1, 1] $ collapsedTailCombos [3, 1, 1, 1, 1])
     , "finds [3, 2, 2] when finding tails of [3, 1, 1, 1, 1]" ~: do
-        True @=? (elem [3, 2, 2] $ Maybe.catMaybes . collapsedTailCombos .
-                                   Just $ [3, 1, 1, 1, 1])
+        True @=? (elem [3, 2, 2] $ collapsedTailCombos [3, 1, 1, 1, 1])
     , "finds [3, 3, 1] when finding tails of [3, 1, 1, 1, 1]" ~: do
-        True @=? (elem [3, 3, 1] $ Maybe.catMaybes . collapsedTailCombos .
-                                   Just $ [3, 1, 1, 1, 1])
+        True @=? (elem [3, 3, 1] $ collapsedTailCombos [3, 1, 1, 1, 1])
     ]
 
 collapseIntoTests =
