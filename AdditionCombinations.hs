@@ -9,33 +9,31 @@ type Combos = [Combo]
 
 additionCombinations :: Int -> Set.Set Combo
 additionCombinations 0 = Set.empty
-additionCombinations x = Set.fromList $ additionCombinations' [[x]]
-
-additionCombinations' :: Combos -> Combos
-additionCombinations' allCombos@(headCombo:_)
-    | all (==1) headCombo = allCombos
-    | otherwise = additionCombinations' $ newCombos ++ allCombos
-    where newCombo = expandedTailCombination headCombo
-          newCombos = newCombo : collapsedTailCombos newCombo
+additionCombinations x = let
+    go allCombos@(headCombo:_)
+        | all (==1) headCombo = allCombos
+        | otherwise = go $ newCombos ++ allCombos
+        where newCombo = expandedTailCombination headCombo
+              newCombos = newCombo : collapsedTailCombos newCombo
+    in Set.fromList $ go [[x]]
 
 expandedTailCombination :: Combo -> Combo
 expandedTailCombination (x:xs) = (x - 1 : 1 : xs)
 
 collapsedTailCombos :: Combo -> Combos
-collapsedTailCombos = collapsedTailCombos' 2
-
-collapsedTailCombos' :: Int -> Combo -> Combos
-collapsedTailCombos' _ [] = []
-collapsedTailCombos' splitIndex combo@(x:xs)
-    | length combo < splitIndex = [combo]
-    | otherwise = collapsed ++ collapsedIntoHead' ++ collapsedIntoSplit'
-    where collapsed = Maybe.catMaybes [collapsedIntoHead, collapsedIntoSplit]
-          collapsedIntoHead = collapseInto 1 combo
-          collapsedIntoSplit = collapseInto splitIndex combo
-          collapsedIntoHead' = emptyOr collapsedTailCombos collapsedIntoHead
-          collapsedIntoSplit' = emptyOr combosForNextSplit collapsedIntoSplit
-          combosForNextSplit = collapsedTailCombos' $ splitIndex + 1
-          emptyOr = maybe []
+collapsedTailCombos = let
+    go _ [] = []
+    go splitIndex combo@(x:xs)
+        | length combo < splitIndex = [combo]
+        | otherwise = collapsed ++ combosForHead ++ combosForSplit
+        where collapsed = Maybe.catMaybes [headCollapsed, splitCollapsed]
+              headCollapsed = collapseInto 1 combo
+              splitCollapsed = collapseInto splitIndex combo
+              combosForHead = emptyOr collapsedTailCombos headCollapsed
+              combosForSplit = emptyOr combosForNextSplit splitCollapsed
+              combosForNextSplit = go $ splitIndex + 1
+              emptyOr = maybe []
+    in go 2
 
 collapseInto :: Int -> Combo -> Maybe Combo
 collapseInto _ [] = Nothing
