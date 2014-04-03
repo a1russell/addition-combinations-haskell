@@ -1,3 +1,7 @@
+module AdditionCombinationsTest
+  ( tests
+  ) where
+
 import qualified Data.Set as Set
 import qualified Data.Maybe as Maybe
 
@@ -71,10 +75,7 @@ collapseIntoTests =
     (Just [3, 3, 1]) @=? collapseInto 1 [3, 2, 1, 1]
   ]
 
-tests = test $ expandedTailCombinationTests
-             ++ collapsedTailCombosTests
-             ++ collapseIntoTests
-             ++ additionCombinationsTests
-
-main :: IO Counts
-main = runTestTT tests
+tests = expandedTailCombinationTests
+     ++ collapsedTailCombosTests
+     ++ collapseIntoTests
+     ++ additionCombinationsTests

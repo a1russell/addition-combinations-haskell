@@ -1,0 +1,24 @@
+name:                partitions
+version:             0.1.0
+author:              Adam Russell
+maintainer:          adamlr6+pub@gmail.com
+category:            Math
+build-type:          Simple
+cabal-version:       >= 1.8
+
+executable partitions
+  main-is:             Main.hs
+  hs-source-dirs:      src/main/haskell
+  exposed-modules:     AdditionCombinations
+  build-depends:       base,
+                       containers
+
+test-suite test
+  type:                exitcode-stdio-1.0
+  main-is:             Main.hs
+  hs-source-dirs:      src/test/haskell,
+                       src/main/haskell
+  ghc-options:         -Wall
+  build-depends:       base,
+                       containers,
+                       HUnit
