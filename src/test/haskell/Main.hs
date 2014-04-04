@@ -1,6 +1,6 @@
 import qualified Test.HUnit
 
-import qualified AdditionCombinationsTest as AC (tests)
+import qualified PartitionsTest as AC (tests)
 
 main :: IO Test.HUnit.Counts
 main =

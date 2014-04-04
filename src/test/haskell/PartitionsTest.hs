@@ -1,4 +1,4 @@
-module AdditionCombinationsTest
+module PartitionsTest
   ( tests
   ) where
 
@@ -7,7 +7,7 @@ import qualified Data.Maybe as Maybe
 
 import Test.HUnit
 
-import AdditionCombinations
+import Partitions
 
 additionCombinationsTests =
   [ "finds no combinations for 0" ~: do
