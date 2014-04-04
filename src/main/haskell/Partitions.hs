@@ -4,44 +4,44 @@ import qualified Control.Monad as Monad
 import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
 
-type Combo = [Int]
-type Combos = [Combo]
+type Partition = [Int]
+type Partitions = [Partition]
 
-additionCombinations :: Int -> Set.Set Combo
-additionCombinations 0 = Set.empty
-additionCombinations x =
+partitions :: Int -> Set.Set Partition
+partitions 0 = Set.empty
+partitions x =
   let
-    go allCombos@(headCombo:_)
-      | all (==1) headCombo = allCombos
-      | otherwise = go $ newCombos ++ allCombos
+    go allPartitions@(headPartition:_)
+      | all (==1) headPartition = allPartitions
+      | otherwise = go $ newPartitions ++ allPartitions
       where
-        newCombo = expandedTailCombination headCombo
-        newCombos = newCombo : collapsedTailCombos newCombo
+        newPartition = expandedTailPartition headPartition
+        newPartitions = newPartition : collapsedTailPartitions newPartition
   in
     Set.fromList $ go [[x]]
 
-expandedTailCombination :: Combo -> Combo
-expandedTailCombination (x:xs) = (x - 1 : 1 : xs)
+expandedTailPartition :: Partition -> Partition
+expandedTailPartition (x:xs) = (x - 1 : 1 : xs)
 
-collapsedTailCombos :: Combo -> Combos
-collapsedTailCombos =
+collapsedTailPartitions :: Partition -> Partitions
+collapsedTailPartitions =
   let
     go _ [] = []
-    go splitIndex combo@(x:xs)
-      | length combo < splitIndex = [combo]
-      | otherwise = collapsed ++ combosForHead ++ combosForSplit
+    go splitIndex partition@(x:xs)
+      | length partition < splitIndex = [partition]
+      | otherwise = collapsed ++ partitionsForHead ++ partitionsForSplit
       where
         collapsed = Maybe.catMaybes [headCollapsed, splitCollapsed]
-        headCollapsed = collapseInto 1 combo
-        splitCollapsed = collapseInto splitIndex combo
-        combosForHead = emptyOr collapsedTailCombos headCollapsed
-        combosForSplit = emptyOr combosForNextSplit splitCollapsed
-        combosForNextSplit = go $ splitIndex + 1
+        headCollapsed = collapseInto 1 partition
+        splitCollapsed = collapseInto splitIndex partition
+        partitionsForHead = emptyOr collapsedTailPartitions headCollapsed
+        partitionsForSplit = emptyOr partitionsForNextSplit splitCollapsed
+        partitionsForNextSplit = go $ splitIndex + 1
         emptyOr = maybe []
   in
     go 2
 
-collapseInto :: Int -> Combo -> Maybe Combo
+collapseInto :: Int -> Partition -> Maybe Partition
 collapseInto _ [] = Nothing
 collapseInto splitIndex xs
   | splitIndex < 1 = Nothing

@@ -9,14 +9,14 @@ import Test.HUnit
 
 import Partitions
 
-additionCombinationsTests =
-  [ "finds no combinations for 0" ~: do
-    Set.fromList [] @=? additionCombinations 0
-  , "finds combination for 2" ~: do
-    Set.fromList [[1, 1], [2]] @=? additionCombinations 2
-  , "finds combinations for 7" ~: do
+partitionsTests =
+  [ "finds no partitions for 0" ~: do
+    Set.fromList [] @=? partitions 0
+  , "finds partitions for 2" ~: do
+    Set.fromList [[1, 1], [2]] @=? partitions 2
+  , "finds partitions for 7" ~: do
     let
-      combinationsOf7 =
+      partitionsOf7 =
         [ [1, 1, 1, 1, 1, 1, 1]
         , [2, 2, 2, 1]
         , [2, 2, 1, 1, 1]
@@ -33,25 +33,25 @@ additionCombinationsTests =
         , [6, 1]
         , [7]
         ]
-    Set.fromList combinationsOf7 @=? additionCombinations 7
+    Set.fromList partitionsOf7 @=? partitions 7
   ]
 
-expandedTailCombinationTests =
+expandedTailPartitionTests =
   [ "separates 1 from 2" ~: do
-    [1, 1] @=? expandedTailCombination [2]
+    [1, 1] @=? expandedTailPartition [2]
   , "moves 1 from 3 into tail of [3, 1]" ~: do
-    [2, 1, 1] @=? expandedTailCombination [3, 1]
+    [2, 1, 1] @=? expandedTailPartition [3, 1]
   ]
 
-collapsedTailCombosTests =
+collapsedTailPartitionsTests =
   [ "finds 3 tails when given [3, 1, 1, 1, 1]" ~: do
-    3 @=? (length . collapsedTailCombos $ [3, 1, 1, 1, 1])
+    3 @=? (length . collapsedTailPartitions $ [3, 1, 1, 1, 1])
   , "finds [3, 2, 1, 1] when finding tails of [3, 1, 1, 1, 1]" ~: do
-    True @=? (elem [3, 2, 1, 1] $ collapsedTailCombos [3, 1, 1, 1, 1])
+    True @=? (elem [3, 2, 1, 1] $ collapsedTailPartitions [3, 1, 1, 1, 1])
   , "finds [3, 2, 2] when finding tails of [3, 1, 1, 1, 1]" ~: do
-    True @=? (elem [3, 2, 2] $ collapsedTailCombos [3, 1, 1, 1, 1])
+    True @=? (elem [3, 2, 2] $ collapsedTailPartitions [3, 1, 1, 1, 1])
   , "finds [3, 3, 1] when finding tails of [3, 1, 1, 1, 1]" ~: do
-    True @=? (elem [3, 3, 1] $ collapsedTailCombos [3, 1, 1, 1, 1])
+    True @=? (elem [3, 3, 1] $ collapsedTailPartitions [3, 1, 1, 1, 1])
   ]
 
 collapseIntoTests =
@@ -75,7 +75,7 @@ collapseIntoTests =
     (Just [3, 3, 1]) @=? collapseInto 1 [3, 2, 1, 1]
   ]
 
-tests = expandedTailCombinationTests
-     ++ collapsedTailCombosTests
+tests = expandedTailPartitionTests
+     ++ collapsedTailPartitionsTests
      ++ collapseIntoTests
-     ++ additionCombinationsTests
+     ++ partitionsTests

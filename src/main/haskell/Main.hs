@@ -19,7 +19,7 @@ main = do
       number <- liftMaybe . Read.readMaybe $ firstArg
       return number
   case arg of
-    (Just arg') -> mapM_ print $ Set.toList . additionCombinations $ arg'
+    (Just arg') -> mapM_ print $ Set.toList . partitions $ arg'
     Nothing -> do
       IO.hPutStrLn IO.stderr $ "Please provide a valid number to partition."
       Exit.exitFailure

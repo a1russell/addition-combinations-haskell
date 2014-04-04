@@ -1,11 +1,11 @@
 import qualified Test.HUnit
 
-import qualified PartitionsTest as AC (tests)
+import qualified PartitionsTest (tests)
 
 main :: IO Test.HUnit.Counts
 main =
   let
-    allTests = [ AC.tests
+    allTests = [ PartitionsTest.tests
                ]
     test = Test.HUnit.test . concat $ allTests
   in do
