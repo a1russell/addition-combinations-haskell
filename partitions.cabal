@@ -11,7 +11,8 @@ executable partitions
   hs-source-dirs:      src/main/haskell
   exposed-modules:     AdditionCombinations
   build-depends:       base,
-                       containers
+                       containers,
+                       transformers
 
 test-suite test
   type:                exitcode-stdio-1.0
