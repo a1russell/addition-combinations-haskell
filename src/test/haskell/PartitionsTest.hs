@@ -75,7 +75,19 @@ collapseIntoTests =
     (Just [3, 3, 1]) @=? collapseInto 1 [3, 2, 1, 1]
   ]
 
+partitionsCountTests =
+  [ "count of partitions of -1 is 0" ~: do
+    0 @=? partitionsCount (-1)
+  , "count of partitions of 0 is 1" ~: do
+    1 @=? partitionsCount 0
+  , "count of partitions of 1 is 1" ~: do
+    1 @=? partitionsCount 1
+  , "count of partitions of 10 is 42" ~: do
+    42 @=? partitionsCount 10
+  ]
+
 tests = expandedTailPartitionTests
      ++ collapsedTailPartitionsTests
      ++ collapseIntoTests
      ++ partitionsTests
+     ++ partitionsCountTests

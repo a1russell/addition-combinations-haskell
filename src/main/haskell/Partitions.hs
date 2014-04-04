@@ -57,3 +57,13 @@ collapseInto splitIndex xs
     splitRhs = splitAt numberToCollapse rhs
     collapsedRhsHead = sum $ fst splitRhs
     newRhsTail = snd splitRhs
+
+partitionsCount :: Int -> Int
+partitionsCount =
+  let
+    partitionsCount' m n
+      | n < 0  = 0
+      | n == 0 = 1
+      | otherwise = sum [partitionsCount' i (n - i) | i <- [m..n]]
+  in
+    partitionsCount' 1
