@@ -5,9 +5,10 @@ import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
 
 type Partition = [Int]
-type Partitions = [Partition]
+type Partitions = Set.Set Partition
+type PartitionList = [Partition]
 
-partitions :: Int -> Set.Set Partition
+partitions :: Int -> Partitions
 partitions 0 = Set.empty
 partitions x =
   let
@@ -23,7 +24,7 @@ partitions x =
 expandedTailPartition :: Partition -> Partition
 expandedTailPartition (x:xs) = (x - 1 : 1 : xs)
 
-collapsedTailPartitions :: Partition -> Partitions
+collapsedTailPartitions :: Partition -> PartitionList
 collapsedTailPartitions =
   let
     go _ [] = []
