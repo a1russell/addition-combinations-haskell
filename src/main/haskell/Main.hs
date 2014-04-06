@@ -16,8 +16,7 @@ main = do
       liftMaybe = MaybeT.MaybeT . return
     in do
       firstArg <- liftMaybe . Maybe.listToMaybe $ take 1 args
-      number <- liftMaybe . Read.readMaybe $ firstArg
-      return number
+      liftMaybe . Read.readMaybe $ firstArg
   case arg of
     (Just arg') -> mapM_ print $ Set.toList . partitions $ arg'
     Nothing -> do
