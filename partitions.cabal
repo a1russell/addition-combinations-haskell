@@ -23,3 +23,13 @@ test-suite test
   build-depends:       base,
                        containers,
                        HUnit
+
+test-suite it
+  type:                exitcode-stdio-1.0
+  main-is:             Main.hs
+  hs-source-dirs:      src/it/haskell,
+                       src/main/haskell
+  ghc-options:         -Wall
+  build-depends:       base,
+                       containers,
+                       QuickCheck >= 2
