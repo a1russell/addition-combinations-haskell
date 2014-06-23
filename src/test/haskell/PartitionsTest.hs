@@ -10,8 +10,8 @@ import Partitions
 
 partitionsTests :: [Test]
 partitionsTests =
-  [ "finds no partitions for 0" ~:
-    Set.fromList [] @=? partitions 0
+  [ "finds empty partition for 0" ~:
+    Set.fromList [[]] @=? partitions 0
   , "finds partition for 2" ~:
     Set.fromList [[1, 1], [2]] @=? partitions 2
   , "finds partitions for 7" ~:

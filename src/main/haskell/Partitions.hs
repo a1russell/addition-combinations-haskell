@@ -9,7 +9,7 @@ type Partitions = Set.Set Partition
 type PartitionList = [Partition]
 
 partitions :: Int -> Partitions
-partitions 0 = Set.empty
+partitions 0 = Set.singleton []
 partitions x =
   let
     go allPartitions@(headPartition:_)
