@@ -9,17 +9,17 @@ type Partitions = Set.Set Partition
 type PartitionList = [Partition]
 
 partitions :: Int -> Partitions
-partitions 0 = Set.singleton []
-partitions x =
-  let
+partitions x
+  | x < 0 = Set.empty
+  | x == 0 = Set.singleton []
+  | otherwise = Set.fromList $ go [[x]]
+  where
     go allPartitions@(headPartition:_)
       | all (==1) headPartition = allPartitions
       | otherwise = go $ newPartitions ++ allPartitions
       where
         newPartition = expandedTailPartition headPartition
         newPartitions = newPartition : collapsedTailPartitions newPartition
-  in
-    Set.fromList $ go [[x]]
 
 expandedTailPartition :: Partition -> Partition
 expandedTailPartition (x:xs) = (x - 1 : 1 : xs)

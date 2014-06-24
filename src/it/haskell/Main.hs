@@ -15,7 +15,7 @@ main =
   let
     isSuccessM = liftM isSuccess
     checkTwentyTimes = quickCheckWithResult stdArgs { maxSuccess = 20 }
-    checkLimitedRange = checkTwentyTimes . forAll (choose (0, 42))
+    checkLimitedRange = checkTwentyTimes . forAll (choose (-4, 42))
   in do
     testsPassed <- isSuccessM . checkLimitedRange $ prop_partitionSumIsArgument
     if testsPassed

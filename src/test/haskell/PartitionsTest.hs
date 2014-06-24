@@ -12,6 +12,8 @@ partitionsTests :: [Test]
 partitionsTests =
   [ "finds empty partition for 0" ~:
     Set.fromList [[]] @=? partitions 0
+  , "finds no partitions for -1" ~:
+    Set.fromList [] @=? partitions (-1)
   , "finds partition for 2" ~:
     Set.fromList [[1, 1], [2]] @=? partitions 2
   , "finds partitions for 7" ~:
