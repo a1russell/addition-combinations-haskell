@@ -1,6 +1,5 @@
 module Partitions where
 
-import qualified Control.Monad as Monad
 import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
 
@@ -14,21 +13,27 @@ partitions x
   | x == 0 = Set.singleton []
   | otherwise = Set.fromList $ go [[x]]
   where
-    go allPartitions@(headPartition:_)
+    go allPartitions
       | all (==1) headPartition = allPartitions
       | otherwise = go $ newPartitions ++ allPartitions
       where
+        headPartition = head allPartitions
         newPartition = expandedTailPartition headPartition
         newPartitions = newPartition : collapsedTailPartitions newPartition
 
 expandedTailPartition :: Partition -> Partition
-expandedTailPartition (x:xs) = (x - 1 : 1 : xs)
+expandedTailPartition allXs =
+  let
+    x = head allXs
+    xs = tail allXs
+  in
+    x - 1 : 1 : xs
 
 collapsedTailPartitions :: Partition -> PartitionList
 collapsedTailPartitions =
   let
     go _ [] = []
-    go splitIndex partition@(x:xs)
+    go splitIndex partition@(_:_)
       | length partition < splitIndex = [partition]
       | otherwise = collapsed ++ partitionsForHead ++ partitionsForSplit
       where
