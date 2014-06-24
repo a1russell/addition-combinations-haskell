@@ -3,7 +3,7 @@ import qualified Test.HUnit
 
 import qualified PartitionsTest (tests)
 
-main :: IO Test.HUnit.Counts
+main :: IO ()
 main =
   let
     allTests = [ PartitionsTest.tests
