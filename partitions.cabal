@@ -9,7 +9,7 @@ cabal-version:       >= 1.8
 executable partitions
   main-is:             Main.hs
   hs-source-dirs:      src/main/haskell
-  exposed-modules:     AdditionCombinations
+  exposed-modules:     Partitions, Partitions.Internal
   build-depends:       base,
                        containers,
                        transformers

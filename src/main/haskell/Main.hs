@@ -6,7 +6,7 @@ import qualified System.Exit as Exit
 import qualified System.IO as IO
 import qualified Text.Read as Read
 
-import Partitions
+import Partitions.Internal
 
 main :: IO ()
 main = do

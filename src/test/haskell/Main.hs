@@ -1,12 +1,14 @@
 import qualified System.Exit
 import qualified Test.HUnit
 
-import qualified PartitionsTest (tests)
+import PartitionsTest (tests)
+import Partitions.InternalTest (tests)
 
 main :: IO ()
 main =
   let
     allTests = [ PartitionsTest.tests
+               , Partitions.InternalTest.tests
                ]
     test = Test.HUnit.test . concat $ allTests
   in do
