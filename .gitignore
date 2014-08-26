@@ -1,6 +1,7 @@
 .cabal-sandbox
 cabal-dev/
 dist/
+.idea/
 *.hi
 *.o
 *~
