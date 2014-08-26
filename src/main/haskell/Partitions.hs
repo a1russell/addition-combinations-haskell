@@ -4,10 +4,18 @@ module Partitions
   , partitionsCount
   ) where
 
+import qualified Control.Monad.Reader as Reader
+
 import qualified Partitions.Internal as Intern
 
 partitions :: Int -> Intern.Partitions
-partitions = undefined
+partitions args =
+  let
+    partitionsEnv = Intern.PartitionsEnv
+      Intern.expandedTailPartition
+      Intern.collapsedTailPartitions
+  in
+    Reader.runReader (Intern.partitions args) partitionsEnv
 
 partitionsCount :: Int -> Int
 partitionsCount =

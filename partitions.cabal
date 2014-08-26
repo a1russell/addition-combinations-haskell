@@ -11,6 +11,7 @@ executable partitions
   hs-source-dirs:      src/main/haskell
   build-depends:       base,
                        containers,
+                       mtl,
                        transformers
 
 test-suite test
@@ -21,6 +22,7 @@ test-suite test
   ghc-options:         -Wall
   build-depends:       base,
                        containers,
+                       mtl,
                        HUnit
 
 test-suite it
@@ -31,4 +33,5 @@ test-suite it
   ghc-options:         -Wall
   build-depends:       base,
                        containers,
+                       mtl,
                        QuickCheck >= 2

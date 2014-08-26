@@ -2,20 +2,28 @@ module Partitions.InternalTest
   ( tests
   ) where
 
+import qualified Control.Monad.Reader as Reader
 import qualified Data.Set as Set
 
 import Test.HUnit
 
 import Partitions.Internal
 
+partitions'' :: Int -> Partitions
+partitions'' args =
+  let
+    env = PartitionsEnv expandedTailPartition collapsedTailPartitions
+  in
+    Reader.runReader (partitions args) env
+
 partitionsTests :: [Test]
 partitionsTests =
   [ "finds empty partition for 0" ~:
-    Set.fromList [[]] @=? partitions 0
+    Set.fromList [[]] @=? partitions'' 0
   , "finds no partitions for -1" ~:
-    Set.fromList [] @=? partitions (-1)
+    Set.fromList [] @=? partitions'' (-1)
   , "finds partition for 2" ~:
-    Set.fromList [[1, 1], [2]] @=? partitions 2
+    Set.fromList [[1, 1], [2]] @=? partitions'' 2
   , "finds partitions for 7" ~:
     let
       partitionsOf7 =
@@ -36,7 +44,7 @@ partitionsTests =
         , [7]
         ]
     in
-      Set.fromList partitionsOf7 @=? partitions 7
+      Set.fromList partitionsOf7 @=? partitions'' 7
   ]
 
 expandedTailPartitionTests :: [Test]

@@ -1,5 +1,6 @@
 module Partitions.Internal where
 
+import qualified Control.Monad.Reader as Reader
 import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
 
@@ -7,19 +8,39 @@ type Partition = [Int]
 type Partitions = Set.Set Partition
 type PartitionList = [Partition]
 
-partitions :: Int -> Partitions
+data PartitionsEnv = PartitionsEnv
+  { expandedTailPartition' :: Partition -> Partition
+  , collapsedTailPartitions' :: Partition -> PartitionList
+  }
+
+type PartitionsReader = Reader.Reader PartitionsEnv
+
+partitions :: Int -> PartitionsReader Partitions
 partitions x
-  | x < 0 = Set.empty
-  | x == 0 = Set.singleton []
-  | otherwise = Set.fromList $ go [[x]]
+  | x < 0 = return Set.empty
+  | x == 0 = return $ Set.singleton []
+  | otherwise = Reader.liftM Set.fromList $ go [[x]]
   where
+    go :: PartitionList -> PartitionsReader PartitionList
     go allPartitions
-      | all (==1) headPartition = allPartitions
-      | otherwise = go $ newPartitions ++ allPartitions
+      | all (==1) headPartition = return allPartitions
+      | otherwise = do
+          env <- Reader.ask
+          let newPartitions' = Reader.runReader newPartitions env
+          go $ newPartitions' ++ allPartitions
       where
+        headPartition :: Partition
         headPartition = head allPartitions
-        newPartition = expandedTailPartition headPartition
-        newPartitions = newPartition : collapsedTailPartitions newPartition
+        newPartition :: PartitionsReader Partition
+        newPartition = do
+           expandedTailPartition'' <- Reader.asks expandedTailPartition'
+           return $ expandedTailPartition'' headPartition
+        newPartitions :: PartitionsReader PartitionList
+        newPartitions = do
+           env <- Reader.ask
+           let collapsedTailPartitions'' = collapsedTailPartitions' env
+           let newPartition' = Reader.runReader newPartition env
+           return $ newPartition' : collapsedTailPartitions'' newPartition'
 
 expandedTailPartition :: Partition -> Partition
 expandedTailPartition allXs =

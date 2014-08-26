@@ -4,7 +4,7 @@ import qualified System.Exit
 import Test.QuickCheck
 import Test.QuickCheck.Test (isSuccess)
 
-import Partitions.Internal
+import Partitions
 
 prop_partitionSumIsArgument :: Int -> Bool
 prop_partitionSumIsArgument x =
