@@ -45,7 +45,9 @@ partitions x
 expandedTailPartition :: Partition -> Partition
 expandedTailPartition allXs =
   let
+    x :: Int
     x = head allXs
+    xs :: Partition
     xs = tail allXs
   in
     x - 1 : 1 : xs
@@ -109,10 +111,17 @@ collapseInto splitIndex xs
   | collapsedRhsHead > last lhs = Nothing
   | otherwise = Just $ lhs ++ collapsedRhsHead : newRhsTail
   where
+    splitXs :: (Partition, Partition)
     splitXs = splitAt splitIndex xs
+    lhs :: Partition
     lhs = fst splitXs
+    rhs :: Partition
     rhs = snd splitXs
+    numberToCollapse :: Int
     numberToCollapse = 2
+    splitRhs :: (Partition, Partition)
     splitRhs = splitAt numberToCollapse rhs
+    collapsedRhsHead :: Int
     collapsedRhsHead = sum $ fst splitRhs
+    newRhsTail :: Partition
     newRhsTail = snd splitRhs
