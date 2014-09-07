@@ -9,10 +9,17 @@ import Test.HUnit
 
 import Partitions.Internal
 
+collapsedTailPartitions'' :: Partition -> PartitionList
+collapsedTailPartitions'' args =
+  let
+    env = CollapsedTailPartitionsEnv collapseInto
+  in
+    Reader.runReader (collapsedTailPartitions args) env
+
 partitions'' :: Int -> Partitions
 partitions'' args =
   let
-    env = PartitionsEnv expandedTailPartition collapsedTailPartitions
+    env = PartitionsEnv expandedTailPartition collapsedTailPartitions''
   in
     Reader.runReader (partitions args) env
 
@@ -58,13 +65,13 @@ expandedTailPartitionTests =
 collapsedTailPartitionsTests :: [Test]
 collapsedTailPartitionsTests =
   [ "finds 3 tails when given [3, 1, 1, 1, 1]" ~:
-    3 @=? (length . collapsedTailPartitions $ [3, 1, 1, 1, 1])
+    3 @=? (length . collapsedTailPartitions'' $ [3, 1, 1, 1, 1])
   , "finds [3, 2, 1, 1] when finding tails of [3, 1, 1, 1, 1]" ~:
-    True @=? (elem [3, 2, 1, 1] $ collapsedTailPartitions [3, 1, 1, 1, 1])
+    True @=? (elem [3, 2, 1, 1] $ collapsedTailPartitions'' [3, 1, 1, 1, 1])
   , "finds [3, 2, 2] when finding tails of [3, 1, 1, 1, 1]" ~:
-    True @=? (elem [3, 2, 2] $ collapsedTailPartitions [3, 1, 1, 1, 1])
+    True @=? (elem [3, 2, 2] $ collapsedTailPartitions'' [3, 1, 1, 1, 1])
   , "finds [3, 3, 1] when finding tails of [3, 1, 1, 1, 1]" ~:
-    True @=? (elem [3, 3, 1] $ collapsedTailPartitions [3, 1, 1, 1, 1])
+    True @=? (elem [3, 3, 1] $ collapsedTailPartitions'' [3, 1, 1, 1, 1])
   ]
 
 collapseIntoTests :: [Test]
