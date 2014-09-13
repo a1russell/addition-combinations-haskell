@@ -9,11 +9,21 @@ prop_partitionSumIsArgument :: Int -> Bool
 prop_partitionSumIsArgument x =
   all (\y -> sum y == x) (toList . partitions $ x)
 
-test :: IO Result
-test =
+prop_partitionIsOrdered :: Int -> Bool
+prop_partitionIsOrdered x =
+  let
+    isDescending xs = and $ zipWith (>=) xs (tail xs)
+  in
+    all isDescending (toList . partitions $ x)
+
+tests :: IO [Result]
+tests =
   let
     checkTwentyTimes = quickCheckWithResult stdArgs { maxSuccess = 20 }
     checkLimitedRange = checkTwentyTimes . forAll (choose (-4, 42))
   in
-    checkLimitedRange prop_partitionSumIsArgument
+    sequence
+      [ checkLimitedRange prop_partitionSumIsArgument
+      , checkLimitedRange prop_partitionIsOrdered
+      ]
 
