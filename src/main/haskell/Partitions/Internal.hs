@@ -60,39 +60,30 @@ type CollapsedTailPartsReader = Reader.Reader CollapsedTailPartitionsEnv
 collapsedTailPartitions :: Partition -> CollapsedTailPartsReader PartitionList
 collapsedTailPartitions =
   let
+    collapseInto'' :: Int
+                   -> Partition
+                   -> CollapsedTailPartsReader (Maybe Partition)
+    collapseInto'' splitIndex xs =
+      Reader.asks $ \env -> collapseInto' env splitIndex xs
     go :: Int -> Partition -> CollapsedTailPartsReader PartitionList
     go _ [] = return []
     go splitIndex partition@(_:_)
       | length partition < splitIndex = return [partition]
-      | otherwise = collapsed ++^ partitionsForHead ++^ partitionsForSplit
+      | otherwise = collapsed <++> partitionsForHead <++> partitionsForSplit
       where
-        (++^) :: CollapsedTailPartsReader PartitionList
-              -> CollapsedTailPartsReader PartitionList
-              -> CollapsedTailPartsReader PartitionList
-        (++^) = Reader.liftM2 (++)
+        (<++>) :: Monad m => m [a] -> m [a] -> m [a]
+        (<++>) = Monad.liftM2 (++)
         collapsed :: CollapsedTailPartsReader PartitionList
-        collapsed = Reader.liftM Maybe.catMaybes $
-                    Reader.sequence [headCollapsed, splitCollapsed]
-        collapseInto'' :: Int
-                       -> Partition
-                       -> CollapsedTailPartsReader (Maybe Partition)
-        collapseInto'' splitIndex' xs = do
-          collapseInto''' <- Reader.asks collapseInto'
-          return $ collapseInto''' splitIndex' xs
+        collapsed = Monad.liftM Maybe.catMaybes $
+                    Monad.sequence [headCollapsed, splitCollapsed]
         headCollapsed :: CollapsedTailPartsReader (Maybe Partition)
         headCollapsed = collapseInto'' 1 partition
         splitCollapsed :: CollapsedTailPartsReader (Maybe Partition)
         splitCollapsed = collapseInto'' splitIndex partition
         partitionsForHead :: CollapsedTailPartsReader PartitionList
-        partitionsForHead = do
-          env <- Reader.ask
-          let headCollapsed' = Reader.runReader headCollapsed env
-          emptyOr collapsedTailPartitions headCollapsed'
+        partitionsForHead = emptyOr collapsedTailPartitions =<< headCollapsed
         partitionsForSplit :: CollapsedTailPartsReader PartitionList
-        partitionsForSplit = do
-          env <- Reader.ask
-          let splitCollapsed' = Reader.runReader splitCollapsed env
-          emptyOr partitionsForNextSplit splitCollapsed'
+        partitionsForSplit = emptyOr partitionsForNextSplit =<< splitCollapsed
         partitionsForNextSplit :: Partition
                                -> CollapsedTailPartsReader PartitionList
         partitionsForNextSplit = go $ splitIndex + 1
