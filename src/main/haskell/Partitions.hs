@@ -4,7 +4,7 @@ module Partitions
   , partitionsCount
   ) where
 
-import qualified Control.Monad.Reader as Reader
+import Control.Monad.Reader (runReader)
 
 import qualified Partitions.Internal as Intern
 
@@ -13,14 +13,14 @@ partitions args =
   let
     collapsedTailPartitionsEnv = Intern.CollapsedTailPartitionsEnv
       Intern.collapseInto
-    collapsedTailPartitions partition = Reader.runReader
+    collapsedTailPartitions partition = runReader
       (Intern.collapsedTailPartitions partition)
       collapsedTailPartitionsEnv
     partitionsEnv = Intern.PartitionsEnv
       Intern.expandedTailPartition
       collapsedTailPartitions
   in
-    Reader.runReader (Intern.partitions args) partitionsEnv
+    runReader (Intern.partitions args) partitionsEnv
 
 partitionsCount :: Int -> Int
 partitionsCount =

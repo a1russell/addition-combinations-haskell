@@ -2,8 +2,8 @@ module Partitions.InternalTest
   ( tests
   ) where
 
-import qualified Control.Monad.Reader as Reader
-import qualified Data.Set as Set
+import Control.Monad.Reader (runReader)
+import Data.Set (fromList)
 
 import Test.HUnit
 
@@ -14,23 +14,23 @@ collapsedTailPartitions'' args =
   let
     env = CollapsedTailPartitionsEnv collapseInto
   in
-    Reader.runReader (collapsedTailPartitions args) env
+    runReader (collapsedTailPartitions args) env
 
 partitions'' :: Int -> Partitions
 partitions'' args =
   let
     env = PartitionsEnv expandedTailPartition collapsedTailPartitions''
   in
-    Reader.runReader (partitions args) env
+    runReader (partitions args) env
 
 partitionsTests :: [Test]
 partitionsTests =
   [ "finds empty partition for 0" ~:
-    Set.fromList [[]] @=? partitions'' 0
+    fromList [[]] @=? partitions'' 0
   , "finds no partitions for -1" ~:
-    Set.fromList [] @=? partitions'' (-1)
+    fromList [] @=? partitions'' (-1)
   , "finds partition for 2" ~:
-    Set.fromList [[1, 1], [2]] @=? partitions'' 2
+    fromList [[1, 1], [2]] @=? partitions'' 2
   , "finds partitions for 7" ~:
     let
       partitionsOf7 =
@@ -51,7 +51,7 @@ partitionsTests =
         , [7]
         ]
     in
-      Set.fromList partitionsOf7 @=? partitions'' 7
+      fromList partitionsOf7 @=? partitions'' 7
   ]
 
 expandedTailPartitionTests :: [Test]
@@ -67,11 +67,11 @@ collapsedTailPartitionsTests =
   [ "finds 3 tails when given [3, 1, 1, 1, 1]" ~:
     3 @=? (length . collapsedTailPartitions'' $ [3, 1, 1, 1, 1])
   , "finds [3, 2, 1, 1] when finding tails of [3, 1, 1, 1, 1]" ~:
-    True @=? (elem [3, 2, 1, 1] $ collapsedTailPartitions'' [3, 1, 1, 1, 1])
+    True @=? elem [3, 2, 1, 1] (collapsedTailPartitions'' [3, 1, 1, 1, 1])
   , "finds [3, 2, 2] when finding tails of [3, 1, 1, 1, 1]" ~:
-    True @=? (elem [3, 2, 2] $ collapsedTailPartitions'' [3, 1, 1, 1, 1])
+    True @=? elem [3, 2, 2] (collapsedTailPartitions'' [3, 1, 1, 1, 1])
   , "finds [3, 3, 1] when finding tails of [3, 1, 1, 1, 1]" ~:
-    True @=? (elem [3, 3, 1] $ collapsedTailPartitions'' [3, 1, 1, 1, 1])
+    True @=? elem [3, 3, 1] (collapsedTailPartitions'' [3, 1, 1, 1, 1])
   ]
 
 collapseIntoTests :: [Test]
@@ -89,11 +89,11 @@ collapseIntoTests =
   , "does not collapse when rhs head >= tail of two-element lhs list" ~:
     Nothing @=? collapseInto 2 [3, 2, 2, 1]
   , "collapses 1 into head of two-element right-hand side list" ~:
-    (Just [3, 3]) @=? collapseInto 1 [3, 2, 1]
+    Just [3, 3] @=? collapseInto 1 [3, 2, 1]
   , "collapses 1 into rhs head when both sides have 2 elements" ~:
-    (Just [4, 3, 3]) @=? collapseInto 2 [4, 3, 2, 1]
+    Just [4, 3, 3] @=? collapseInto 2 [4, 3, 2, 1]
   , "collapses 1 into head of three-element rhs list" ~:
-    (Just [3, 3, 1]) @=? collapseInto 1 [3, 2, 1, 1]
+    Just [3, 3, 1] @=? collapseInto 1 [3, 2, 1, 1]
   ]
 
 tests :: [Test]
