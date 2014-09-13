@@ -22,32 +22,22 @@ partitions x
   | x == 0 = return $ Set.singleton []
   | otherwise = Monad.liftM Set.fromList $ go [[x]]
   where
-    expandedTailPartition'' :: Partition -> PartitionsReader Partition
     expandedTailPartition'' = Reader.asks . flip expandedTailPartition'
-    collapsedTailPartitions'' :: Partition -> PartitionsReader PartitionList
     collapsedTailPartitions'' = Reader.asks . flip collapsedTailPartitions'
-    go :: PartitionList -> PartitionsReader PartitionList
     go allPartitions
       | all (==1) headPartition = return allPartitions
       | otherwise = go . (++ allPartitions) =<< newPartitions
       where
-        headPartition :: Partition
         headPartition = head allPartitions
-        newPartition :: PartitionsReader Partition
         newPartition = expandedTailPartition'' headPartition
-        newCollapsedTailPartitions :: PartitionsReader PartitionList
         newCollapsedTailPartitions = collapsedTailPartitions'' =<< newPartition
-        (<:>) :: Monad m => m a -> m [a] -> m [a]
         (<:>) = Monad.liftM2 (:)
-        newPartitions :: PartitionsReader PartitionList
         newPartitions = newPartition <:> newCollapsedTailPartitions
 
 expandedTailPartition :: Partition -> Partition
 expandedTailPartition allXs =
   let
-    x :: Int
     x = head allXs
-    xs :: Partition
     xs = tail allXs
   in
     x - 1 : 1 : xs
@@ -60,36 +50,21 @@ type CollapsedTailPartsReader = Reader.Reader CollapsedTailPartitionsEnv
 collapsedTailPartitions :: Partition -> CollapsedTailPartsReader PartitionList
 collapsedTailPartitions =
   let
-    collapseInto'' :: Int
-                   -> Partition
-                   -> CollapsedTailPartsReader (Maybe Partition)
     collapseInto'' splitIndex xs =
       Reader.asks $ \env -> collapseInto' env splitIndex xs
-    go :: Int -> Partition -> CollapsedTailPartsReader PartitionList
     go _ [] = return []
     go splitIndex partition@(_:_)
       | length partition < splitIndex = return [partition]
       | otherwise = collapsed <++> partitionsForHead <++> partitionsForSplit
       where
-        (<++>) :: Monad m => m [a] -> m [a] -> m [a]
         (<++>) = Monad.liftM2 (++)
-        collapsed :: CollapsedTailPartsReader PartitionList
         collapsed = Monad.liftM Maybe.catMaybes $
                     Monad.sequence [headCollapsed, splitCollapsed]
-        headCollapsed :: CollapsedTailPartsReader (Maybe Partition)
         headCollapsed = collapseInto'' 1 partition
-        splitCollapsed :: CollapsedTailPartsReader (Maybe Partition)
         splitCollapsed = collapseInto'' splitIndex partition
-        partitionsForHead :: CollapsedTailPartsReader PartitionList
         partitionsForHead = emptyOr collapsedTailPartitions =<< headCollapsed
-        partitionsForSplit :: CollapsedTailPartsReader PartitionList
         partitionsForSplit = emptyOr partitionsForNextSplit =<< splitCollapsed
-        partitionsForNextSplit :: Partition
-                               -> CollapsedTailPartsReader PartitionList
         partitionsForNextSplit = go $ splitIndex + 1
-        emptyOr :: (Partition -> CollapsedTailPartsReader PartitionList)
-                -> Maybe Partition
-                -> CollapsedTailPartsReader PartitionList
         emptyOr = maybe $ return []
   in
     go 2
@@ -102,17 +77,11 @@ collapseInto splitIndex xs
   | collapsedRhsHead > last lhs = Nothing
   | otherwise = Just $ lhs ++ collapsedRhsHead : newRhsTail
   where
-    splitXs :: (Partition, Partition)
     splitXs = splitAt splitIndex xs
-    lhs :: Partition
     lhs = fst splitXs
-    rhs :: Partition
     rhs = snd splitXs
-    numberToCollapse :: Int
     numberToCollapse = 2
-    splitRhs :: (Partition, Partition)
     splitRhs = splitAt numberToCollapse rhs
-    collapsedRhsHead :: Int
     collapsedRhsHead = sum $ fst splitRhs
-    newRhsTail :: Partition
     newRhsTail = snd splitRhs
+
