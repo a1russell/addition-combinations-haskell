@@ -1,5 +1,6 @@
 module Partitions.Internal where
 
+import qualified Control.Monad as Monad
 import qualified Control.Monad.Reader as Reader
 import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
@@ -19,28 +20,27 @@ partitions :: Int -> PartitionsReader Partitions
 partitions x
   | x < 0 = return Set.empty
   | x == 0 = return $ Set.singleton []
-  | otherwise = Reader.liftM Set.fromList $ go [[x]]
+  | otherwise = Monad.liftM Set.fromList $ go [[x]]
   where
+    expandedTailPartition'' :: Partition -> PartitionsReader Partition
+    expandedTailPartition'' = Reader.asks . flip expandedTailPartition'
+    collapsedTailPartitions'' :: Partition -> PartitionsReader PartitionList
+    collapsedTailPartitions'' = Reader.asks . flip collapsedTailPartitions'
     go :: PartitionList -> PartitionsReader PartitionList
     go allPartitions
       | all (==1) headPartition = return allPartitions
-      | otherwise = do
-          env <- Reader.ask
-          let newPartitions' = Reader.runReader newPartitions env
-          go $ newPartitions' ++ allPartitions
+      | otherwise = go . (++ allPartitions) =<< newPartitions
       where
         headPartition :: Partition
         headPartition = head allPartitions
         newPartition :: PartitionsReader Partition
-        newPartition = do
-           expandedTailPartition'' <- Reader.asks expandedTailPartition'
-           return $ expandedTailPartition'' headPartition
+        newPartition = expandedTailPartition'' headPartition
+        newCollapsedTailPartitions :: PartitionsReader PartitionList
+        newCollapsedTailPartitions = collapsedTailPartitions'' =<< newPartition
+        (<:>) :: Monad m => m a -> m [a] -> m [a]
+        (<:>) = Monad.liftM2 (:)
         newPartitions :: PartitionsReader PartitionList
-        newPartitions = do
-           env <- Reader.ask
-           let collapsedTailPartitions'' = collapsedTailPartitions' env
-           let newPartition' = Reader.runReader newPartition env
-           return $ newPartition' : collapsedTailPartitions'' newPartition'
+        newPartitions = newPartition <:> newCollapsedTailPartitions
 
 expandedTailPartition :: Partition -> Partition
 expandedTailPartition allXs =
