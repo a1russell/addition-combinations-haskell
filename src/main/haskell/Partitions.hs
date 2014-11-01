@@ -11,14 +11,8 @@ import qualified Partitions.Internal as Intern
 partitions :: Int -> Intern.Partitions
 partitions args =
   let
-    collapsedTailPartitionsEnv = Intern.CollapsedTailPartitionsEnv
-      Intern.collapseInto
-    collapsedTailPartitions partition = runReader
-      (Intern.collapsedTailPartitions partition)
-      collapsedTailPartitionsEnv
     partitionsEnv = Intern.PartitionsEnv
-      Intern.expandedTailPartition
-      collapsedTailPartitions
+      Intern.appendOneAndMaybeIncrementLast
   in
     runReader (Intern.partitions args) partitionsEnv
 

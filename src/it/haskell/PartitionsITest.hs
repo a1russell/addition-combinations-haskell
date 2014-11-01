@@ -16,6 +16,10 @@ prop_partitionIsOrdered x =
   in
     all isDescending (toList . partitions $ x)
 
+prop_numberOfPartitions :: Int -> Bool
+prop_numberOfPartitions x =
+  partitionsCount x == length (toList $ partitions x)
+
 tests :: IO [Result]
 tests =
   let
@@ -25,5 +29,6 @@ tests =
     sequence
       [ checkLimitedRange prop_partitionSumIsArgument
       , checkLimitedRange prop_partitionIsOrdered
+      , checkLimitedRange prop_numberOfPartitions
       ]
 
