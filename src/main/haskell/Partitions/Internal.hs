@@ -31,7 +31,7 @@ partitions x
 appendOneAndMaybeIncrementLast :: Partition -> Partitions
 appendOneAndMaybeIncrementLast partition =
   let
-    lastLessThanNextToLast  =
+    lastLessThanNextToLast =
       not (null partition) &&
         ((length partition < 2) ||
          (last (init partition) > last partition))
