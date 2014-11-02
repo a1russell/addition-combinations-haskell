@@ -20,5 +20,5 @@ main = do
   case arg of
     (Just arg') -> mapM_ print $ Set.toList . partitions $ arg'
     Nothing -> do
-      IO.hPutStrLn IO.stderr $ "Please provide a valid number to partition."
+      IO.hPutStrLn IO.stderr "Please provide a valid number to partition."
       Exit.exitFailure
