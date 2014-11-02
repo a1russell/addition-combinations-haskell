@@ -12,9 +12,9 @@ prop_partitionSumIsArgument x =
 prop_partitionIsOrdered :: Int -> Bool
 prop_partitionIsOrdered x =
   let
-    isDescending xs = and $ zipWith (>=) xs (tail xs)
+    isAscending xs = and $ zipWith (<=) xs (tail xs)
   in
-    all isDescending (toList . partitions $ x)
+    all isAscending (toList . partitions $ x)
 
 prop_numberOfPartitions :: Int -> Bool
 prop_numberOfPartitions x =

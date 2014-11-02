@@ -12,7 +12,7 @@ partitions :: Int -> Intern.Partitions
 partitions args =
   let
     partitionsEnv = Intern.PartitionsEnv
-      Intern.appendOneAndMaybeIncrementLast
+      Intern.insertOneAndMaybeIncrementLeast
   in
     runReader (Intern.partitions args) partitionsEnv
 

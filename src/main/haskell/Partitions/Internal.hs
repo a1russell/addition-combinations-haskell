@@ -14,7 +14,7 @@ type Partition = [Int]
 type Partitions = Set Partition
 
 data PartitionsEnv = PartitionsEnv
-  { appendOneAndMaybeIncrementLast' :: Partition -> Partitions
+  { insertOneAndMaybeIncrementLeast' :: Partition -> Partitions
   }
 
 type PartitionsReader = Reader PartitionsEnv
@@ -25,20 +25,20 @@ partitions x
   | x == 0 = return $ singleton []
   | otherwise =
       liftM2 foldMap
-        (asks appendOneAndMaybeIncrementLast')
+        (asks insertOneAndMaybeIncrementLeast')
         (partitions (x - 1))
 
-appendOneAndMaybeIncrementLast :: Partition -> Partitions
-appendOneAndMaybeIncrementLast partition =
+insertOneAndMaybeIncrementLeast :: Partition -> Partitions
+insertOneAndMaybeIncrementLeast partition =
   let
-    lastLessThanNextToLast =
+    hasOnlyOneOfLeast =
       not (null partition) &&
         ((length partition < 2) ||
-         (last (init partition) > last partition))
+         (head (tail partition) > head partition))
     maybePartitionWithIncrementedLast =
-      if lastLessThanNextToLast
-        then singleton (init partition ++ [last partition + 1])
+      if hasOnlyOneOfLeast
+        then singleton (head partition + 1 : tail partition)
         else empty
   in
-    insert (partition ++ [1]) maybePartitionWithIncrementedLast
+    insert (1 : partition) maybePartitionWithIncrementedLast
 
