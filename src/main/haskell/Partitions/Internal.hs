@@ -3,6 +3,8 @@ module Partitions.Internal where
 import Control.Monad (liftM2)
 import Control.Monad.Reader (Reader, asks)
 import Data.Foldable (foldMap)
+import Data.IntMultiSet (IntMultiSet)
+import qualified Data.IntMultiSet as IntMultiSet
 import Data.Set
   ( Set
   , empty
@@ -10,7 +12,7 @@ import Data.Set
   , singleton
   )
 
-type Partition = [Int]
+type Partition = IntMultiSet
 type Partitions = Set Partition
 
 data PartitionsEnv = PartitionsEnv
@@ -22,7 +24,7 @@ type PartitionsReader = Reader PartitionsEnv
 partitions :: Int -> PartitionsReader Partitions
 partitions x
   | x < 0 = return empty
-  | x == 0 = return $ singleton []
+  | x == 0 = return $ singleton IntMultiSet.empty
   | otherwise =
       liftM2 foldMap
         (asks insertOneAndMaybeIncrementLeast')
@@ -31,14 +33,20 @@ partitions x
 insertOneAndMaybeIncrementLeast :: Partition -> Partitions
 insertOneAndMaybeIncrementLeast partition =
   let
+    leastInPartition = IntMultiSet.findMin partition
     hasOnlyOneOfLeast =
-      not (null partition) &&
-        ((length partition < 2) ||
-         (head (tail partition) > head partition))
+      not (IntMultiSet.null partition) &&
+        ((IntMultiSet.size partition < 2) ||
+         (IntMultiSet.occur leastInPartition partition == 1))
     maybePartitionWithIncrementedLast =
       if hasOnlyOneOfLeast
-        then singleton (head partition + 1 : tail partition)
+        then singleton
+          (IntMultiSet.insert
+            (leastInPartition + 1)
+            (IntMultiSet.deleteMin partition))
         else empty
   in
-    insert (1 : partition) maybePartitionWithIncrementedLast
+    insert
+      (IntMultiSet.insert 1 partition)
+      maybePartitionWithIncrementedLast
 

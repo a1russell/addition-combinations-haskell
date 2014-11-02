@@ -1,4 +1,5 @@
 import qualified Control.Monad.Trans.Maybe as MaybeT
+import qualified Data.IntMultiSet as IntMultiSet
 import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
 import qualified System.Environment as Env
@@ -17,8 +18,9 @@ main = do
     in do
       firstArg <- liftMaybe . Maybe.listToMaybe $ take 1 args
       liftMaybe . Read.readMaybe $ firstArg
+  let partitions' x = map IntMultiSet.toList (Set.toList . partitions $ x)
   case arg of
-    (Just arg') -> mapM_ print $ Set.toList . partitions $ arg'
+    (Just arg') -> mapM_ print $ partitions' arg'
     Nothing -> do
       IO.hPutStrLn IO.stderr "Please provide a valid number to partition."
       Exit.exitFailure

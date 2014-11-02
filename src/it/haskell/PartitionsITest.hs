@@ -1,5 +1,6 @@
 module PartitionsITest where
 
+import qualified Data.IntMultiSet as IntMultiSet
 import Data.Set (toList)
 import Test.QuickCheck
 
@@ -7,14 +8,7 @@ import Partitions
 
 prop_partitionSumIsArgument :: Int -> Bool
 prop_partitionSumIsArgument x =
-  all (\y -> sum y == x) (toList . partitions $ x)
-
-prop_partitionIsOrdered :: Int -> Bool
-prop_partitionIsOrdered x =
-  let
-    isAscending xs = and $ zipWith (<=) xs (tail xs)
-  in
-    all isAscending (toList . partitions $ x)
+  all (\y -> sum y == x) (map IntMultiSet.toList (toList . partitions $ x))
 
 prop_numberOfPartitions :: Int -> Bool
 prop_numberOfPartitions x =
@@ -28,7 +22,6 @@ tests =
   in
     sequence
       [ checkLimitedRange prop_partitionSumIsArgument
-      , checkLimitedRange prop_partitionIsOrdered
       , checkLimitedRange prop_numberOfPartitions
       ]
 

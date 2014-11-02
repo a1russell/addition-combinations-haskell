@@ -12,6 +12,7 @@ executable partitions
   build-depends:       base,
                        containers,
                        mtl,
+                       multiset,
                        transformers
 
 test-suite test
@@ -23,6 +24,7 @@ test-suite test
   build-depends:       base,
                        containers,
                        mtl,
+                       multiset,
                        HUnit
 
 test-suite it
@@ -34,4 +36,6 @@ test-suite it
   build-depends:       base,
                        containers,
                        mtl,
+                       multiset,
                        QuickCheck >= 2
+
