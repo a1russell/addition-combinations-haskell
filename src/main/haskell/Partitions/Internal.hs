@@ -36,8 +36,7 @@ insertOneAndMaybeIncrementLeast partition =
     leastInPartition = IntMultiSet.findMin partition
     hasOnlyOneOfLeast =
       not (IntMultiSet.null partition) &&
-        ((IntMultiSet.size partition < 2) ||
-         (IntMultiSet.occur leastInPartition partition == 1))
+        IntMultiSet.occur leastInPartition partition == 1
     maybePartitionWithIncrementedLast =
       if hasOnlyOneOfLeast
         then singleton
